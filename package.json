@@ -1,0 +1,36 @@
+{
+  "name": "discordbot",
+  "version": "1.0.0",
+	"description": "",
+  "main": "index.js",
+	"scripts": {
+		"start": "node ./dist/index.js",
+		"watch": "tsc -p tsconfig.json -w",
+		"test": "mocha -r ts-node/register \"tests/**/*.spec.ts\""
+	},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slashroot101/DiscordBot.git"
+  },
+  "author": "slashroot101",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Slashroot101/DiscordBot/issues"
+  },
+  "homepage": "https://github.com/Slashroot101/DiscordBot#readme",
+  "dependencies": {
+    "@types/node": "^13.11.1",
+    "discord.js": "^12.1.1",
+    "dotenv": "^8.2.0",
+    "inversify": "^5.0.1",
+    "reflect-metadata": "^0.1.13",
+    "typescript": "^3.8.3"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^7.0.2",
+    "chai": "^4.2.0",
+    "mocha": "^7.1.1",
+    "ts-node": "^8.8.2"
+  }
+}
