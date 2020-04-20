@@ -2,22 +2,21 @@ import { Message } from "discord.js";
 import { Command } from "./Command";
 import { CommandContext } from "./CommandContext";
 import { Reactor } from "./Reactor";
-import {inject, injectable} from "inversify";
-import {TYPES} from "../types";
+import {injectable} from "inversify";
 
-//commands
-import {Ping} from '../commands/Ping';
 @injectable()
 export class CommandHandler {
 	private commands: Command[];
 	private readonly serverPrefix: Map<string, string>;
 	private readonly reactor: Reactor;
 	constructor(serverPrefix: Map<string, string>, reactor: Reactor){
-		this.commands = [
-			new Ping(),
-		];
 		this.reactor = reactor;
 		this.serverPrefix = serverPrefix;
+	}
+
+	withCommands(commands: Command[]): CommandHandler{
+		this.commands = commands;
+		return this;
 	}
 
 	async handleMessage(message: Message): Promise<void> {
@@ -39,7 +38,8 @@ export class CommandHandler {
 	}
 
 	private findCommand(context: CommandContext): Command {
-		const command = this.commands.find(command => command.commandNames.includes(context.parsedCommandName));
+		console.log(this.commands)
+		const command = this.commands.find(command => command.name === context.parsedCommandName || command.alias.includes(context.parsedCommandName));
 		return command;
 	}
 

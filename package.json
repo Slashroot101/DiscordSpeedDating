@@ -24,6 +24,8 @@
     "discord.js-commando": "github:discordjs/Commando",
     "dotenv": "^8.2.0",
     "fs": "0.0.1-security",
+    "glob": "^7.1.6",
+    "glob-promise": "^3.4.0",
     "inversify": "^5.0.1",
     "reflect-metadata": "^0.1.13",
     "typescript": "^3.8.3"
