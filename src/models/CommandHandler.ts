@@ -3,19 +3,25 @@ import { Command } from "./Command";
 import { CommandContext } from "./CommandContext";
 import { Reactor } from "./Reactor";
 import {injectable} from "inversify";
-
+import {CommandGroup} from './CommandGroup';
 @injectable()
 export class CommandHandler {
-	private commands: Command[];
+	private commandGroups: CommandGroup[];
 	private readonly serverPrefix: Map<string, string>;
 	private readonly reactor: Reactor;
+	
 	constructor(serverPrefix: Map<string, string>, reactor: Reactor){
 		this.reactor = reactor;
 		this.serverPrefix = serverPrefix;
 	}
 
-	withCommands(commands: Command[]): CommandHandler{
-		this.commands = commands;
+	withCommandGroup(commandGroups: CommandGroup): CommandHandler{
+		this.commandGroups.push(commandGroups);
+		return this;
+	}
+
+	withCommandGroups(commandGroups: CommandGroup[]): CommandHandler {
+		this.commandGroups = commandGroups;
 		return this;
 	}
 
@@ -24,7 +30,7 @@ export class CommandHandler {
 			return;
 		}
 		const commandContext = new CommandContext(message, this.getGuildPrefix(message));
-		const command = this.findCommand(commandContext);
+		const command: Command = this.findCommand(commandContext);
 		try {
 			await command.run(commandContext);
 			await this.reactor.success(message);
@@ -38,8 +44,11 @@ export class CommandHandler {
 	}
 
 	private findCommand(context: CommandContext): Command {
-		console.log(this.commands)
-		const command = this.commands.find(command => command.name === context.parsedCommandName || command.alias.includes(context.parsedCommandName));
+		let command: Command = null;
+		for(let commandGroup of this.commandGroups){
+			command = commandGroup.findCommand(context);
+			if(command !== null) { break };
+		}
 		return command;
 	}
 

@@ -1,5 +1,5 @@
-import { Command } from "../models/command";
-import { CommandContext } from "../models/CommandContext";
+import { Command } from "../../models/command";
+import { CommandContext } from "../../models/CommandContext";
 
 class Ping implements Command {
 		readonly name = 'ping';
@@ -9,8 +9,8 @@ class Ping implements Command {
 			await parsedUserCommand.originalMessage.reply("Pong!");
 		}
 
-		getHelpMessage(commandPrefix: string): string{
-			return `Use ${commandPrefix}ping to pong!`;
+		getHelpMessage(): string{
+			return `Use {prefix}ping to pong!`;
 		}
 
 		hasPermissionsToRun(parsedUserCommnad: CommandContext): boolean {

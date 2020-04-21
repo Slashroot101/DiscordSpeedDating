@@ -3,23 +3,16 @@ import container from "./inversify.config";
 import {TYPES} from "./types";
 import {Bot} from "./bot";
 import {readdir, fstat} from "fs";
-import {Command} from './models/Command';
+import {CommandGroup} from './models/CommandGroup';
+
 let bot = container.get<Bot>(TYPES.Bot);
 bot.listen().then(async () => {
-	readdir(`${__dirname}/commands`, async (err, files) => {
-		if(err){
-			console.log('Death by loading commands...', err);
-		}
-		const commands = [];
-		for (const file of files) {
-			if (file.substr(file.lastIndexOf('.') + 1) === 'js'){
-				const command = (await import(`${__dirname}/commands/${file}`)).default;
-				commands.push(command);
-			}
-		}
-		bot.withCommands(commands);
-		console.log('Logged in!')
-	})
+	let commandGroups = [
+		new CommandGroup('Util', 'A group of utility commands').registerCommandsInPath(__dirname + '/commands'),
+	];
+
+	bot.withCommandGroups(commandGroups);
+	
 }).catch((error) => {
   console.log('Oh no! ', error)
 });

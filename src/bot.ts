@@ -4,7 +4,7 @@ import {TYPES} from "./types";
 import {CommandHandler} from "./models/CommandHandler";
 import container from "./inversify.config";
 import { Reactor } from "./models/Reactor";
-import {Command} from './models/Command';
+import {CommandGroup} from "./models/CommandGroup";
 @injectable()
 export class Bot {
 	private client: Client;
@@ -25,9 +25,13 @@ export class Bot {
 		);
 	}
 	
-	public withCommands(commands: Command[]): Bot {
-		console.log(commands)
-		this.commandHandler.withCommands(commands);
+	public withCommandGroup(commandGroup: CommandGroup): Bot {
+		this.commandHandler.withCommandGroup(commandGroup);
+		return this;
+	}
+
+	public withCommandGroups(commandGroup: CommandGroup[]): Bot {
+		this.commandHandler.withCommandGroups(commandGroup);
 		return this;
 	}
 
