@@ -2,15 +2,15 @@ import { Command } from "../../models/command";
 import { CommandContext } from "../../models/CommandContext";
 
 class Ping implements Command {
-		readonly name = 'ping';
-		readonly alias = ['Ping'];
+		readonly name: string = 'ping';
+		readonly alias: string[] = ['Ping'];
 
 		async run(parsedUserCommand: CommandContext): Promise<void> {
 			await parsedUserCommand.originalMessage.reply("Pong!");
 		}
 
-		getHelpMessage(): string{
-			return `Use {prefix}ping to pong!`;
+		getHelpMessage(commandContext: CommandContext): object[] {
+			return [{}];
 		}
 
 		hasPermissionsToRun(parsedUserCommnad: CommandContext): boolean {
@@ -18,4 +18,4 @@ class Ping implements Command {
 		}
 }
 
-export default new Ping();
+export const ping = new Ping();

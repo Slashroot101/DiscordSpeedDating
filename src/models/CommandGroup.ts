@@ -1,5 +1,6 @@
 import { Command } from './Command';
 import { CommandContext } from "./CommandContext";
+import {resolve} from "path";
 
 export class CommandGroup {
 	private groupName: string;
@@ -12,14 +13,13 @@ export class CommandGroup {
 	}
 
 	registerCommandsInPath(path: string): CommandGroup {
+		console.log(path)
 		const files = require('require-all')(
 			{
-				dirname: path,
-				filter: /.js$/,
-				recursive: false,
-			}
+				dirname: resolve(path),
+				recursive: false
+			},
 		);
-
 		const commands = [];
 		for(const group of Object.values(files)) {
 			for(let command of Object.values(group)) {
@@ -37,9 +37,22 @@ export class CommandGroup {
 		return command;
 	} 
 
-	getHelpMessage(): string {
-		let ret: string = `${this.groupName} -- ${this.description}\n`;
-		ret += this.commands.map(command => command.getHelpMessage()).join('\n');
-		return ret;
+	getHelpMessage(messageContext: CommandContext): object[] {
+		let fields: object[] = [];
+		this.commands.forEach((command, index) => {
+			fields.push({
+				name: `**${index === 0 ? this.groupName : '\u200b'}**`,
+				value: `${command.hasPermissionsToRun(messageContext) ? ':white_check_mark:' : ':x:'} ${command.name}`,
+				inline: true,
+			});
+		});
+		if(fields.length % 3 !== 0){
+			fields.push({
+				name: '\u200b',
+				value: '\u200b',
+				inline: true,
+			});
+		}
+		return fields;
 	}
 }

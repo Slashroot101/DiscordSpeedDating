@@ -2,17 +2,25 @@ import { Message } from "discord.js";
 import { Command } from "./Command";
 import { CommandContext } from "./CommandContext";
 import { Reactor } from "./Reactor";
-import {injectable} from "inversify";
-import {CommandGroup} from './CommandGroup';
+import { injectable } from "inversify";
+import { CommandGroup } from './CommandGroup';
+import { CommandArgument } from "./CommandArgument";
+
 @injectable()
 export class CommandHandler {
 	private commandGroups: CommandGroup[];
 	private readonly serverPrefix: Map<string, string>;
 	private readonly reactor: Reactor;
+	private readonly argumentTypes: Map<string, CommandArgument>;
 	
-	constructor(serverPrefix: Map<string, string>, reactor: Reactor){
+	constructor(serverPrefix: Map<string, string>, reactor: Reactor, argumentTypes: Map<string, CommandArgument>){
 		this.reactor = reactor;
 		this.serverPrefix = serverPrefix;
+		this.argumentTypes = argumentTypes;
+	}
+
+	getArgumentTypes(){
+		return this.argumentTypes;
 	}
 
 	withCommandGroup(commandGroups: CommandGroup): CommandHandler{
@@ -29,12 +37,13 @@ export class CommandHandler {
 		if(message.author.bot || !this.isCommand(message)){
 			return;
 		}
-		const commandContext = new CommandContext(message, this.getGuildPrefix(message));
+		const commandContext: CommandContext = new CommandContext(message, this.getGuildPrefix(message), this.commandGroups);
 		const command: Command = this.findCommand(commandContext);
 		try {
 			await command.run(commandContext);
 			await this.reactor.success(message);
 		} catch (err) {
+			console.log(err)
 			await this.reactor.failure(message);
 		}
 	}

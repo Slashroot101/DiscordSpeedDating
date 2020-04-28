@@ -10,4 +10,5 @@ container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
 container.bind<Client>(TYPES.Client).toConstantValue(new Client());
 container.bind<string>(TYPES.Token).toConstantValue(process.env.TOKEN);
 container.bind<string>(TYPES.ReactionsEnabled).toConstantValue(process.env.reactionsEnabled);
+
 export default container;

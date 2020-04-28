@@ -1,9 +1,9 @@
-import {MessageContext} from './MessageContext';
+import {CommandContext} from './CommandContext';
 
 export interface Command {
 	readonly name: string;
 	readonly alias: string[];
-	getHelpMessage(): string;
-	run(parsedUserCommand: MessageContext): Promise<void>;
-	hasPermissionsToRun(parsedUserCommand: MessageContext): boolean;
+	getHelpMessage(messageContext: CommandContext): object[];
+	run(parsedUserCommand: CommandContext): Promise<void>;
+	hasPermissionsToRun(parsedUserCommand: CommandContext): boolean;
 }
