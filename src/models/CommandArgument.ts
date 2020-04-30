@@ -3,7 +3,8 @@ import { Message } from "discord.js";
 import { IArgumentInfo } from "./IArgumentInfo";
 import { CommandArgumentType } from "./CommandArgumentType";
 import { IArgumentResult } from "./IArgumentResult";
-import {stripIndents, oneLine} from 'common-tags';
+import { stripIndents, oneLine } from 'common-tags';
+const { escapeMarkdown } = require('discord.js');
 
 export class CommandArgument {
 	private name: string;
@@ -35,7 +36,7 @@ export class CommandArgument {
 			}
 		}
 
-		if(this.infinite) return this.obtainInfinite(msg, val, promptLimit);
+		if(this.infinite) return this.obtainInfinite(msg, [val], promptLimit);
 
 		const wait = this.waitTime > 0 && this.waitTime !== Infinity ? this.waitTime * 1000 : undefined;
 		let valid = !argIsEmpty ? await this.validate() : false;
@@ -96,17 +97,108 @@ export class CommandArgument {
 		};
 	}
 	
-	async obtainInfinite(msg: Message, val: string, promptLimit: Number = Infinity): Promise<IArgumentResult>{
+	async obtainInfinite(msg: Message, vals: string[], promptLimit: Number = Infinity): Promise<IArgumentResult>{
 		const wait = this.waitTime > 0 && this.waitTime !== Infinity ? this.waitTime * 1000 : undefined;
 		let results = [];
 		let prompts = [];
 		let answers = [];
 		let currentVal = 0;
-		return {
-			value: 1,
-			cancelled: '',
-			prompts: [],
-			answers: [],
+
+		while(true) {
+			/* eslint-disable no-await-in-loop */
+			let val = vals && vals[currentVal] ? vals[currentVal] : null;
+			let valid = val ? await this.validate(val, msg) : false;
+			let attempts = 0;
+
+			while(!valid || typeof valid === 'string') {
+				attempts++;
+				if(attempts > promptLimit) {
+					return {
+						value: null,
+						cancelled: 'promptLimit',
+						prompts,
+						answers
+					};
+				}
+
+				// Prompt the user for a new value
+				if(val) {
+					const escaped = escapeMarkdown(val).replace(/@/g, '@\u200b');
+					prompts.push(await msg.reply(stripIndents`
+						${valid ? valid : oneLine`
+							You provided an invalid ${this.label},
+							"${escaped.length < 1850 ? escaped : '[too long to show]'}".
+							Please try again.
+						`}
+						${oneLine`
+							Respond with \`cancel\` to cancel the command, or \`finish\` to finish entry up to this point.
+							${wait ? `The command will automatically be cancelled in ${this.waitTime} seconds.` : ''}
+						`}
+					`));
+				} else if(results.length === 0) {
+					prompts.push(await msg.reply(stripIndents`
+						${this.prompt}
+						${oneLine`
+							Respond with \`cancel\` to cancel the command, or \`finish\` to finish entry.
+							${wait ? `The command will automatically be cancelled in ${this.waitTime} seconds, unless you respond.` : ''}
+						`}
+					`));
+				}
+
+				// Get the user's response
+				const responses = await msg.channel.awaitMessages(msg2 => msg2.author.id === msg.author.id, {
+					max: 1,
+					time: wait
+				});
+
+				// Make sure they actually answered
+				if(responses && responses.size === 1) {
+					answers.push(responses.first());
+					val = answers[answers.length - 1].content;
+				} else {
+					return {
+						value: null,
+						cancelled: 'time',
+						prompts,
+						answers
+					};
+				}
+
+				// See if they want to finish or cancel
+				const lc = val.toLowerCase();
+				if(lc === 'finish') {
+					return {
+						value: results.length > 0 ? results : null,
+						cancelled: this.default ? null : results.length > 0 ? null : 'user',
+						prompts,
+						answers
+					};
+				}
+				if(lc === 'cancel') {
+					return {
+						value: null,
+						cancelled: 'user',
+						prompts,
+						answers
+					};
+				}
+
+				valid = await this.validate(val, msg);
+			}
+
+			results.push(await this.parse(val, msg));
+
+			if(vals) {
+				currentVal++;
+				if(currentVal === vals.length) {
+					return {
+						value: results,
+						cancelled: null,
+						prompts,
+						answers
+					};
+				}
+			}
 		}
 	}
 
