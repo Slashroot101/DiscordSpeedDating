@@ -15,7 +15,7 @@ export class MemberArgumentType extends CommandArgumentType {
 			try {
 				const member = await msg.guild.members.fetch(await msg.client.users.fetch(matches[1]));
 				if(!member) return false;
-				if(arg.getOneOf() && !arg.getOneOf().includes(member.id)) return false;
+				if(arg.$oneOf && !arg.$oneOf.includes(member.id)) return false;
 				return true;
 			} catch(err) {
 				return false;
@@ -25,12 +25,12 @@ export class MemberArgumentType extends CommandArgumentType {
 		let members = msg.guild.members.cache.filter(memberFilterInexact(search));
 		if(members.size === 0) return false;
 		if(members.size === 1) {
-			if(arg.getOneOf() && !arg.getOneOf().includes(members.first().id)) return false;
+			if(arg.$oneOf && !arg.$oneOf.includes(members.first().id)) return false;
 			return true;
 		}
 		const exactMembers = members.filter(memberFilterExact(search));
 		if(exactMembers.size === 1) {
-			if(arg.getOneOf() && !arg.getOneOf().includes(exactMembers.first().id)) return false;
+			if(arg.$oneOf && !arg.$oneOf.includes(exactMembers.first().id)) return false;
 			return true;
 		}
 		if(exactMembers.size > 0) members = exactMembers;

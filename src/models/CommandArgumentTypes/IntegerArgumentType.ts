@@ -10,14 +10,14 @@ export class IntegerArgumentType extends CommandArgumentType {
 	async validate(val: string, msg: Message, arg: CommandArgument): Promise<boolean | string> {
 		const int = Number.parseInt(val);
 		if(Number.isNaN(int)) return false;
-		if(arg.getOneOf() && !arg.getOneOf().includes(val)) {
-			return `Please enter one of the following options: ${arg.getOneOf().map(opt => `\`${opt}\``).join(', ')}`;
+		if(arg.$oneOf && !arg.$oneOf.includes(val)) {
+			return `Please enter one of the following options: ${arg.$oneOf.map(opt => `\`${opt}\``).join(', ')}`;
 		}
-		if(arg.getMin() !== null && typeof arg.getMin() !== 'undefined' && int < arg.getMin()) {
-			return `Please enter a number above or exactly ${arg.getMin()}.`;
+		if(arg.$min !== null && typeof arg.$min !== 'undefined' && int < arg.$min) {
+			return `Please enter a number above or exactly ${arg.$min}.`;
 		}
-		if(arg.getMax() !== null && typeof arg.getMax() !== 'undefined' && int > arg.getMax()) {
-			return `Please enter a number below or exactly ${arg.getMax()}.`;
+		if(arg.$max !== null && typeof arg.$max !== 'undefined' && int > arg.$max) {
+			return `Please enter a number below or exactly ${arg.$max}.`;
 		}
 		return true;
 	}

@@ -20,6 +20,7 @@
   "homepage": "https://github.com/Slashroot101/DiscordBot#readme",
   "dependencies": {
     "@types/node": "^13.11.1",
+    "common-tags": "^1.8.0",
     "discord.js": "^12.1.1",
     "discord.js-commando": "github:discordjs/Commando",
     "dotenv": "^8.2.0",

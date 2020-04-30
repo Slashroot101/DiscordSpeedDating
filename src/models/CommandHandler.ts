@@ -5,21 +5,22 @@ import { Reactor } from "./Reactor";
 import { injectable } from "inversify";
 import { CommandGroup } from './CommandGroup';
 import { CommandArgument } from "./CommandArgument";
+import { CommandArgumentType } from "./CommandArgumentType";
 
 @injectable()
 export class CommandHandler {
 	private commandGroups: CommandGroup[];
 	private readonly serverPrefix: Map<string, string>;
 	private readonly reactor: Reactor;
-	private readonly argumentTypes: Map<string, CommandArgument>;
+	private readonly argumentTypes: Map<string, CommandArgumentType>;
 	
-	constructor(serverPrefix: Map<string, string>, reactor: Reactor, argumentTypes: Map<string, CommandArgument>){
+	constructor(serverPrefix: Map<string, string>, reactor: Reactor, argumentTypes: Map<string, CommandArgumentType>){
 		this.reactor = reactor;
 		this.serverPrefix = serverPrefix;
 		this.argumentTypes = argumentTypes;
 	}
 
-	getArgumentTypes(){
+	get $argumentTypes(): Map<string, CommandArgumentType>{
 		return this.argumentTypes;
 	}
 

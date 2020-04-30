@@ -7,20 +7,20 @@ class StringArgumentType extends CommandArgumentType {
 		super('string');
 	}
 
-	validate(val: string, msg: Message, arg: CommandArgument): boolean | string{
-		if(arg.getOneOf() && !arg.getOneOf().includes(val.toLowerCase())) {
-			return `Please enter one of the following options: ${arg.getOneOf().map(opt => `\`${opt}\``).join(', ')}`;
+	async validate(val: string, msg: Message, arg: CommandArgument): Promise<boolean | string>{
+		if(arg.$oneOf && !arg.$oneOf.includes(val.toLowerCase())) {
+			return `Please enter one of the following options: ${arg.$oneOf.map(opt => `\`${opt}\``).join(', ')}`;
 		}
-		if(arg.getMin() !== null && typeof arg.getMin() !== 'undefined' && val.length < arg.getMin()) {
-			return `Please keep the ${arg.getLabel()} above or exactly ${arg.getMin()} characters.`;
+		if(arg.$min !== null && typeof arg.$min !== 'undefined' && val.length < arg.$min) {
+			return `Please keep the ${arg.$min} above or exactly ${arg.$min} characters.`;
 		}
-		if(arg.getMax() !== null && typeof arg.getMax() !== 'undefined' && val.length > arg.getMax()) {
-			return `Please keep the ${arg.getLabel()} below or exactly ${arg.getMax()} characters.`;
+		if(arg.$max !== null && typeof arg.$max !== 'undefined' && val.length > arg.$max) {
+			return `Please keep the ${arg.$label} below or exactly ${arg.$label} characters.`;
 		}
 		return true;
 	}
 
-	parse(val): string {
+	parse(val: string): string {
 		return val;
 	}
 }

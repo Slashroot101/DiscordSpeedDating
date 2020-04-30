@@ -15,12 +15,12 @@ export class RoleArgumentType extends CommandArgumentType {
 		let roles = msg.guild.roles.cache.filter(nameFilterInexact(search));
 		if(roles.size === 0) return false;
 		if(roles.size === 1) {
-			if(arg.getOneOf() && !arg.getOneOf().includes(roles.first().id)) return false;
+			if(arg.$oneOf && !arg.$oneOf.includes(roles.first().id)) return false;
 			return true;
 		}
 		const exactRoles = roles.filter(nameFilterExact(search));
 		if(exactRoles.size === 1) {
-			if(arg.getOneOf() && !arg.getOneOf().includes(exactRoles.first().id)) return false;
+			if(arg.$oneOf && !arg.$oneOf.includes(exactRoles.first().id)) return false;
 			return true;
 		}
 		if(exactRoles.size > 0) roles = exactRoles;
